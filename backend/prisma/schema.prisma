@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  projects     Project[]
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  sourceType  String
+  sourcePath  String?
+  status      String   @default("PENDING")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  files        ProjectFile[]
+  commits      Commit[]
+  contributors Contributor[]
+  dependencies Dependency[]
+  findings     SecurityFinding[]
+  riskScores   RiskScore[]
+}
+
+model ProjectFile {
+  id        String   @id @default(cuid())
+  path      String
+  name      String
+  extension String?
+  sizeBytes Int
+  lines     Int?
+  language  String?
+  isTest    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, path])
+}
+
+model Commit {
+  id          String   @id @default(cuid())
+  hash        String
+  authorName  String
+  authorEmail String?
+  message     String
+  committedAt DateTime
+  additions   Int      @default(0)
+  deletions   Int      @default(0)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, hash])
+}
+
+model Contributor {
+  id           String @id @default(cuid())
+  name         String
+  email        String?
+  commitCount  Int    @default(0)
+  linesAdded   Int    @default(0)
+  linesRemoved Int    @default(0)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, email])
+}
+
+model Dependency {
+  id         String   @id @default(cuid())
+  sourceFile String
+  targetFile String
+  type       String
+  createdAt  DateTime @default(now())
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, sourceFile, targetFile])
+}
+
+model SecurityFinding {
+  id             String   @id @default(cuid())
+  severity       String
+  type           String
+  filePath       String
+  line           Int?
+  evidence       String?
+  description    String
+  recommendation String?
+  scanner        String
+  confidence     Float?
+  createdAt      DateTime @default(now())
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model RiskScore {
+  id            String   @id @default(cuid())
+  filePath      String
+  score         Int
+  reasons       Json
+  calculatedAt  DateTime @default(now())
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, filePath])
+}

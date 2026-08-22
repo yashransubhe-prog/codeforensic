@@ -1,4 +1,4 @@
-﻿import "dotenv/config";
+import "dotenv/config";
 
 import express from "express";
 import cors from "cors";
@@ -9,7 +9,6 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.routes";
 import aiRoutes from "./routes/ai.routes";
 import projectRoutes from "./routes/project.routes";
-import intelligenceRoutes from "./routes/intelligence.routes";
 
 import { requireAuth } from "./middleware/auth.middleware";
 
@@ -71,11 +70,6 @@ app.use(
   aiRoutes,
 );
 
-app.use(
-  "/api/intelligence",
-  requireAuth,
-  intelligenceRoutes,
-);
 app.use((_req, res) => {
   res.status(404).json({
     success: false,
@@ -114,4 +108,3 @@ app.listen(PORT, () => {
   );
   console.log("");
 });
-

@@ -1,6 +1,5 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -8,14 +7,14 @@ datasource db {
 }
 
 model User {
-  id           String    @id @default(cuid())
-  email        String    @unique
+  id           String   @id @default(cuid())
+  email        String   @unique
   passwordHash String
   name         String
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  projects     Project[]
+  projects Project[]
 }
 
 model Project {
@@ -28,8 +27,8 @@ model Project {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  ownerId     String
-  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId String
+  owner   User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   files        ProjectFile[]
   commits      Commit[]
@@ -51,7 +50,7 @@ model ProjectFile {
   createdAt DateTime @default(now())
 
   projectId String
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, path])
 }
@@ -117,11 +116,11 @@ model SecurityFinding {
 }
 
 model RiskScore {
-  id            String   @id @default(cuid())
-  filePath      String
-  score         Int
-  reasons       Json
-  calculatedAt  DateTime @default(now())
+  id           String   @id @default(cuid())
+  filePath     String
+  score        Int
+  reasons      Json
+  calculatedAt DateTime @default(now())
 
   projectId String
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)

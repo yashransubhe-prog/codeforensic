@@ -1,11 +1,10 @@
-﻿import ForensicWorkbench from "./components/ForensicWorkbench";
+import ForensicWorkbench from "./components/ForensicWorkbench";
 import {
   Activity,
   AlertTriangle,
   Bot,
   Boxes,
   ChevronRight,
-  Clock3,
   Code2,
   FileCode2,
   Fingerprint,
@@ -42,6 +41,7 @@ import type {
 } from "./types";
 
 type Page =
+  | "workbench"
   | "overview"
   | "dna"
   | "timeline"
@@ -157,7 +157,7 @@ function App() {
 
           <div>
             <strong>CODEFORENSIC</strong>
-            <span>INVESTIGATE Â· TRACE Â· EXPLAIN</span>
+            <span>INVESTIGATE · TRACE · EXPLAIN</span>
           </div>
         </div>
 
@@ -189,7 +189,7 @@ function App() {
 
             <div>
               <strong>Analysis Engine</strong>
-              <small>LOCAL Â· OPERATIONAL</small>
+              <small>LOCAL · OPERATIONAL</small>
             </div>
           </div>
 
@@ -230,7 +230,7 @@ function App() {
             <div className="command-search">
               <Search size={14} />
               <span>Search evidence, files, findings...</span>
-              <kbd>âŒ˜ K</kbd>
+              <kbd>⌘ K</kbd>
             </div>
 
             <div className="local-status">
@@ -450,7 +450,7 @@ function Auth({
 
         <div>
           <strong>CODEFORENSIC</strong>
-          <span>INVESTIGATE Â· TRACE Â· EXPLAIN</span>
+          <span>INVESTIGATE · TRACE · EXPLAIN</span>
         </div>
       </div>
 
@@ -685,7 +685,7 @@ function Timeline({ project }: { project: Project }) {
                 <strong>{commit.message}</strong>
 
                 <p>
-                  {commit.authorName} Â·{" "}
+                  {commit.authorName} ·{" "}
                   {new Date(
                     commit.committedAt
                   ).toLocaleString()}

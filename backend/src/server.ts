@@ -15,14 +15,16 @@ import { requireAuth } from "./middleware/auth.middleware";
 
 const app = express();
 
-const PORT =
-  Number(process.env.PORT) || 5000;
+const PORT = Number(process.env.PORT) || 5000;
 
 app.use(helmet());
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://codeforensic.vercel.app",
+    ],
     credentials: true,
   }),
 );
@@ -34,7 +36,6 @@ app.use(
 );
 
 app.use(cookieParser());
-
 app.use(morgan("dev"));
 
 app.get("/", (_req, res) => {
@@ -54,10 +55,7 @@ app.get("/api/health", (_req, res) => {
   });
 });
 
-app.use(
-  "/api/auth",
-  authRoutes,
-);
+app.use("/api/auth", authRoutes);
 
 app.use(
   "/api/projects",
@@ -76,6 +74,7 @@ app.use(
   requireAuth,
   intelligenceRoutes,
 );
+
 app.use((_req, res) => {
   res.status(404).json({
     success: false,
@@ -85,33 +84,15 @@ app.use((_req, res) => {
 
 app.listen(PORT, () => {
   console.log("");
-  console.log(
-    "======================================",
-  );
-  console.log(
-    "          CODEFORENSIC API",
-  );
-  console.log(
-    "======================================",
-  );
-  console.log(
-    `Server   : http://localhost:${PORT}`,
-  );
-  console.log(
-    `Health   : http://localhost:${PORT}/api/health`,
-  );
-  console.log(
-    `Auth     : http://localhost:${PORT}/api/auth`,
-  );
-  console.log(
-    `Projects : http://localhost:${PORT}/api/projects`,
-  );
-  console.log(
-    `AI       : http://localhost:${PORT}/api/ai/chat`,
-  );
-  console.log(
-    "======================================",
-  );
+  console.log("======================================");
+  console.log("          CODEFORENSIC API");
+  console.log("======================================");
+  console.log(`Server   : http://localhost:${PORT}`);
+  console.log(`Health   : http://localhost:${PORT}/api/health`);
+  console.log(`Auth     : http://localhost:${PORT}/api/auth`);
+  console.log(`Projects : http://localhost:${PORT}/api/projects`);
+  console.log(`AI       : http://localhost:${PORT}/api/ai/chat`);
+  console.log(`Intel    : http://localhost:${PORT}/api/intelligence`);
+  console.log("======================================");
   console.log("");
 });
-

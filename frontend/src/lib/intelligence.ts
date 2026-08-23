@@ -1,12 +1,6 @@
 export type IntelligenceIssue = {
   id: string;
-  category:
-    | "BUG"
-    | "ERROR"
-    | "SECURITY"
-    | "MALWARE"
-    | "SECRET"
-    | "NETWORK";
+  category: "BUG" | "ERROR" | "SECURITY" | "MALWARE" | "SECRET" | "NETWORK";
   severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   title: string;
   filePath: string;
@@ -22,13 +16,7 @@ export type IntelligenceIssue = {
 };
 
 export type IntelligenceResult = {
-  project: {
-    id: string;
-    name: string;
-    status: string;
-    sourceType: string;
-  };
-
+  project: { id: string; name: string; status: string; sourceType: string };
   summary: {
     scannedFiles: number;
     totalIssues: number;
@@ -38,12 +26,10 @@ export type IntelligenceResult = {
     malwareRisk: number;
     suspiciousFiles: number;
   };
-
   issues: IntelligenceIssue[];
   malware: IntelligenceIssue[];
   bugs: IntelligenceIssue[];
   security: IntelligenceIssue[];
-
   hotspots: Array<{
     filePath: string;
     score: number;
@@ -53,34 +39,18 @@ export type IntelligenceResult = {
   }>;
 };
 
-const API = "http://localhost:5000/api";
+const API = "https://codeforensic.onrender.com/api";
 
 export async function getIntelligence(projectId: string) {
   const token = localStorage.getItem("cf_token");
+  if (!token) throw new Error("Authentication required");
 
-  if (!token) {
-    throw new Error("Authentication required");
-  }
-
-  const response = await fetch(
-    `${API}/intelligence/projects/${projectId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-  );
-
+  const response = await fetch(`${API}/intelligence/projects/${projectId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   const data = await response.json().catch(() => ({}));
-
   if (!response.ok) {
-    throw new Error(
-      data.message || "Could not load forensic intelligence",
-    );
+    throw new Error(data.message || "Could not load forensic intelligence");
   }
-
-  return data as {
-    success: boolean;
-    intelligence: IntelligenceResult;
-  };
+  return data as { success: boolean; intelligence: IntelligenceResult };
 }

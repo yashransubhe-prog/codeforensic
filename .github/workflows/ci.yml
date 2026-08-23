@@ -9,6 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/codeforensic?schema=public
+      JWT_SECRET: ci-only-secret
     steps:
       - uses: actions/checkout@v4
 

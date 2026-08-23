@@ -5,6 +5,7 @@ import "./styles.css";
 import "./workbench.css";
 import "./landing.css";
 import "./polish.css";
+import "./mobile.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

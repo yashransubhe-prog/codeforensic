@@ -1,11 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LandingPage from "./components/LandingPage";
 import WorldClassApp from "./WorldClassApp";
 
-export default function RootExperience() {
+function hasOAuthReturn() {
   const params = new URLSearchParams(window.location.search);
-  const oauthReturn = params.has("auth_token") && params.has("auth_user");
-  const [entered, setEntered] = useState(oauthReturn);
+  return Boolean(params.get("auth_token") && params.get("auth_user"));
+}
+
+export default function RootExperience() {
+  const [entered, setEntered] = useState(() => hasOAuthReturn() || Boolean(localStorage.getItem("cf_token")));
+
+  useEffect(() => {
+    if (hasOAuthReturn()) setEntered(true);
+  }, []);
 
   if (!entered) return <LandingPage onEnter={() => setEntered(true)} />;
   return <WorldClassApp />;

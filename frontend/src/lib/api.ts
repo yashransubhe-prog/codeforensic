@@ -1,6 +1,6 @@
 import type { Project, User } from "../types";
 
-const API = "https://codeforensic.onrender.com";
+const API = "https://codeforensic.onrender.com/api";
 
 export const storage = {
   token: () => localStorage.getItem("cf_token"),
@@ -102,6 +102,16 @@ export async function importProject(file: File, name?: string) {
       method: "POST",
       body: form,
     }
+  );
+}
+
+export async function importGithubProject(url: string) {
+  return request<{ success: boolean; project: Project }>(
+    "/github/import",
+    {
+      method: "POST",
+      body: JSON.stringify({ url }),
+    },
   );
 }
 

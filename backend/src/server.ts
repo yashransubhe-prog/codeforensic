@@ -1,4 +1,4 @@
-﻿import "dotenv/config";
+import "dotenv/config";
 
 import express from "express";
 import cors from "cors";
@@ -10,6 +10,7 @@ import authRoutes from "./routes/auth.routes";
 import aiRoutes from "./routes/ai.routes";
 import projectRoutes from "./routes/project.routes";
 import intelligenceRoutes from "./routes/intelligence.routes";
+import githubRoutes from "./routes/github.routes";
 
 import { requireAuth } from "./middleware/auth.middleware";
 
@@ -64,6 +65,12 @@ app.use(
 );
 
 app.use(
+  "/api/github",
+  requireAuth,
+  githubRoutes,
+);
+
+app.use(
   "/api/ai",
   requireAuth,
   aiRoutes,
@@ -91,6 +98,7 @@ app.listen(PORT, () => {
   console.log(`Health   : http://localhost:${PORT}/api/health`);
   console.log(`Auth     : http://localhost:${PORT}/api/auth`);
   console.log(`Projects : http://localhost:${PORT}/api/projects`);
+  console.log(`GitHub   : http://localhost:${PORT}/api/github/import`);
   console.log(`AI       : http://localhost:${PORT}/api/ai/chat`);
   console.log(`Intel    : http://localhost:${PORT}/api/intelligence`);
   console.log("======================================");

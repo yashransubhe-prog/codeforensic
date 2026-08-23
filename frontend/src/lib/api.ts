@@ -1,4 +1,4 @@
-import type { Project, User } from "../types";
+import type { Dependency, Project, User } from "../types";
 
 const API = "https://codeforensic.onrender.com/api";
 
@@ -26,7 +26,6 @@ async function request<T>(
   options: RequestInit = {}
 ): Promise<T> {
   const token = storage.token();
-
   const headers = new Headers(options.headers);
 
   if (!(options.body instanceof FormData)) {
@@ -49,6 +48,29 @@ async function request<T>(
   }
 
   return data;
+}
+
+function ensureAllFilesAppearInGraph(project: Project): Project {
+  const represented = new Set<string>();
+
+  project.dependencies.forEach((edge) => {
+    represented.add(edge.sourceFile);
+    represented.add(edge.targetFile);
+  });
+
+  const fileMarkers: Dependency[] = project.files
+    .filter((file) => !represented.has(file.path))
+    .map((file) => ({
+      id: `file-index:${file.id}`,
+      sourceFile: file.path,
+      targetFile: file.path,
+      type: "FILE_INDEX",
+    }));
+
+  return {
+    ...project,
+    dependencies: [...project.dependencies, ...fileMarkers],
+  };
 }
 
 export async function register(
@@ -82,37 +104,51 @@ export async function listProjects() {
 }
 
 export async function getProject(id: string) {
-  return request<{ success: boolean; project: Project }>(
+  const result = await request<{ success: boolean; project: Project }>(
     `/projects/${id}`
   );
+
+  return {
+    ...result,
+    project: ensureAllFilesAppearInGraph(result.project),
+  };
 }
 
 export async function importProject(file: File, name?: string) {
   const form = new FormData();
-
   form.append("project", file);
 
   if (name) {
     form.append("name", name);
   }
 
-  return request<{ success: boolean; project: Project }>(
+  const result = await request<{ success: boolean; project: Project }>(
     "/projects/import",
     {
       method: "POST",
       body: form,
     }
   );
+
+  return {
+    ...result,
+    project: ensureAllFilesAppearInGraph(result.project),
+  };
 }
 
 export async function importGithubProject(url: string) {
-  return request<{ success: boolean; project: Project }>(
+  const result = await request<{ success: boolean; project: Project }>(
     "/github/import",
     {
       method: "POST",
       body: JSON.stringify({ url }),
     },
   );
+
+  return {
+    ...result,
+    project: ensureAllFilesAppearInGraph(result.project),
+  };
 }
 
 export async function askAI(

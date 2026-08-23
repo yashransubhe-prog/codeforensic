@@ -1,6 +1,6 @@
 import type { Project, User } from "../types";
 
-const API = "https://codeforensic.onrender.com";
+const API = "https://codeforensic.onrender.com/api";
 
 export const storage = {
   token: () => localStorage.getItem("cf_token"),

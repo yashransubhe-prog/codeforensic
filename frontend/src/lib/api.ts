@@ -105,6 +105,16 @@ export async function importProject(file: File, name?: string) {
   );
 }
 
+export async function importGithubProject(url: string) {
+  return request<{ success: boolean; project: Project }>(
+    "/github/import",
+    {
+      method: "POST",
+      body: JSON.stringify({ url }),
+    },
+  );
+}
+
 export async function askAI(
   message: string,
   projectId?: string

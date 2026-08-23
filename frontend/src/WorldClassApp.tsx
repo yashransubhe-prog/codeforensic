@@ -8,7 +8,6 @@ import {
   FileCode2,
   Fingerprint,
   Gauge,
-  Github,
   GitBranch,
   LayoutDashboard,
   LogOut,
@@ -354,7 +353,7 @@ function AuthScreen({ onSuccess }: { onSuccess: (user: any) => void }) {
             className="btn secondary"
             onClick={() => { window.location.href = `${API}/api/auth/github`; }}
           >
-            <Github size={15} /> Continue with GitHub
+            <GitBranch size={15} /> Continue with GitHub
           </button>
         </div>
 
@@ -643,7 +642,7 @@ function ImportModal({
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
           <button type="button" className={`btn ${mode === "zip" ? "primary" : "secondary"}`} onClick={() => setMode("zip")}><Upload size={14} /> ZIP Upload</button>
-          <button type="button" className={`btn ${mode === "github" ? "primary" : "secondary"}`} onClick={() => setMode("github")}><Github size={14} /> GitHub URL</button>
+          <button type="button" className={`btn ${mode === "github" ? "primary" : "secondary"}`} onClick={() => setMode("github")}><GitBranch size={14} /> GitHub URL</button>
         </div>
 
         {mode === "zip" ? (

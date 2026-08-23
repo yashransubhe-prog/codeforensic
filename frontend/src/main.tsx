@@ -4,6 +4,7 @@ import RootExperience from "./RootExperience";
 import "./styles.css";
 import "./workbench.css";
 import "./landing.css";
+import "./polish.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

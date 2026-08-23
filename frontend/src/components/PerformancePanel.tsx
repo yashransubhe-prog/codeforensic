@@ -3,12 +3,11 @@ import {
   AlertTriangle,
   FileWarning,
   Gauge,
-  Network,
   PackageSearch,
   Rocket,
   TestTube2,
 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 
 import type { Project } from "../types";
 
@@ -101,7 +100,6 @@ export default function PerformancePanel({ project }: { project: Project }) {
       testFiles,
       testRatio: noTestRatio,
       score,
-      highRisk,
       hugeSourceFiles,
       largeFiles,
       hotspots,
@@ -210,7 +208,7 @@ function Metric({
   value,
   detail,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   label: string;
   value: string | number;
   detail: string;

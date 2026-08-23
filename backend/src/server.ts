@@ -15,78 +15,49 @@ import githubRoutes from "./routes/github.routes";
 import { requireAuth } from "./middleware/auth.middleware";
 
 const app = express();
-
 const PORT = Number(process.env.PORT) || 5000;
 
 app.use(helmet());
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://codeforensic.vercel.app",
+  "https://codeforensic-web.onrender.com",
+  process.env.FRONTEND_URL,
+].filter(Boolean) as string[];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://codeforensic.vercel.app",
-    ],
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error(`CORS blocked origin: ${origin}`));
+    },
     credentials: true,
   }),
 );
 
-app.use(
-  express.json({
-    limit: "2mb",
-  }),
-);
-
+app.use(express.json({ limit: "2mb" }));
 app.use(cookieParser());
 app.use(morgan("dev"));
 
 app.get("/", (_req, res) => {
-  res.json({
-    success: true,
-    product: "CodeForensic",
-    tagline: "Investigate. Trace. Explain.",
-  });
+  res.json({ success: true, product: "CodeForensic", tagline: "Investigate. Trace. Explain." });
 });
 
 app.get("/api/health", (_req, res) => {
-  res.json({
-    success: true,
-    service: "CodeForensic API",
-    status: "operational",
-    timestamp: new Date().toISOString(),
-  });
+  res.json({ success: true, service: "CodeForensic API", status: "operational", timestamp: new Date().toISOString() });
 });
 
 app.use("/api/auth", authRoutes);
-
-app.use(
-  "/api/projects",
-  requireAuth,
-  projectRoutes,
-);
-
-app.use(
-  "/api/github",
-  requireAuth,
-  githubRoutes,
-);
-
-app.use(
-  "/api/ai",
-  requireAuth,
-  aiRoutes,
-);
-
-app.use(
-  "/api/intelligence",
-  requireAuth,
-  intelligenceRoutes,
-);
+app.use("/api/projects", requireAuth, projectRoutes);
+app.use("/api/github", requireAuth, githubRoutes);
+app.use("/api/ai", requireAuth, aiRoutes);
+app.use("/api/intelligence", requireAuth, intelligenceRoutes);
 
 app.use((_req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "API route not found",
-  });
+  res.status(404).json({ success: false, message: "API route not found" });
 });
 
 app.listen(PORT, () => {

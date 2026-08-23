@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import { prisma } from "../config/prisma";
 
 function getJwtSecret(): string {
@@ -12,10 +13,23 @@ function getJwtSecret(): string {
   return secret;
 }
 
+function signUserToken(user: { id: string; email: string }) {
+  return jwt.sign(
+    {
+      userId: user.id,
+      email: user.email,
+    },
+    getJwtSecret(),
+    {
+      expiresIn: "7d",
+    },
+  );
+}
+
 export async function registerUser(
   name: string,
   email: string,
-  password: string
+  password: string,
 ) {
   const normalizedEmail = email.trim().toLowerCase();
 
@@ -45,26 +59,15 @@ export async function registerUser(
     },
   });
 
-  const token = jwt.sign(
-    {
-      userId: user.id,
-      email: user.email,
-    },
-    getJwtSecret(),
-    {
-      expiresIn: "7d",
-    }
-  );
-
   return {
     user,
-    token,
+    token: signUserToken(user),
   };
 }
 
 export async function loginUser(
   email: string,
-  password: string
+  password: string,
 ) {
   const normalizedEmail = email.trim().toLowerCase();
 
@@ -80,31 +83,64 @@ export async function loginUser(
 
   const passwordValid = await bcrypt.compare(
     password,
-    user.passwordHash
+    user.passwordHash,
   );
 
   if (!passwordValid) {
     throw new Error("INVALID_CREDENTIALS");
   }
 
-  const token = jwt.sign(
-    {
-      userId: user.id,
-      email: user.email,
-    },
-    getJwtSecret(),
-    {
-      expiresIn: "7d",
-    }
-  );
+  const publicUser = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    createdAt: user.createdAt,
+  };
 
   return {
-    user: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      createdAt: user.createdAt,
-    },
-    token,
+    user: publicUser,
+    token: signUserToken(publicUser),
+  };
+}
+
+export async function loginOAuthUser(
+  name: string,
+  email: string,
+) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (!normalizedEmail) {
+    throw new Error("OAUTH_EMAIL_REQUIRED");
+  }
+
+  let user = await prisma.user.findUnique({
+    where: { email: normalizedEmail },
+  });
+
+  if (!user) {
+    const placeholderPassword = await bcrypt.hash(
+      crypto.randomBytes(32).toString("hex"),
+      12,
+    );
+
+    user = await prisma.user.create({
+      data: {
+        name: name.trim() || normalizedEmail.split("@")[0],
+        email: normalizedEmail,
+        passwordHash: placeholderPassword,
+      },
+    });
+  }
+
+  const publicUser = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    createdAt: user.createdAt,
+  };
+
+  return {
+    user: publicUser,
+    token: signUserToken(publicUser),
   };
 }

@@ -31,9 +31,9 @@ jobs:
         working-directory: backend
         run: npx prisma generate
 
-      - name: Build backend
+      - name: Type-check backend
         working-directory: backend
-        run: npm run build
+        run: npx tsc --noEmit
 
       - name: Install frontend
         working-directory: frontend

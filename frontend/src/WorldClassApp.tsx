@@ -366,22 +366,7 @@ function AuthScreen({ onSuccess }: { onSuccess: (user: any) => void }) {
             <p style={{ margin: 0, maxWidth: 570, color: "#94a3b8", fontSize: 14 }}>Your pointer actively probes the forensic field — following code, security signals and dependency evidence in real time.</p>
           </div>
         </div>
-        <div className="auth-mesh" />
-        <div className="auth-scanner" />
-        <div className="auth-orbit orbit-a" /><div className="auth-orbit orbit-b" />
-        <div className="auth-core">
-          <div className="core-ring ring-1" /><div className="core-ring ring-2" />
-          <Fingerprint size={54} />
-          <span>CF</span>
-        </div>
-        <div className="auth-eye eye-left"><i style={{ transform: `translate(calc((${authPointer.x} - 50) * .09px), calc((${authPointer.y} - 50) * .07px))` }} /></div>
-        <div className="auth-eye eye-right"><i style={{ transform: `translate(calc((${authPointer.x} - 50) * .09px), calc((${authPointer.y} - 50) * .07px))` }} /></div>
-        <div className="auth-file file-a"><Code2 size={15}/><span>server.ts</span><b>TRACE</b></div>
-        <div className="auth-file file-b"><ShieldCheck size={15}/><span>security</span><b>SCAN</b></div>
-        <div className="auth-file file-c"><Boxes size={15}/><span>dependency</span><b>MAP</b></div>
-        <svg className="auth-links" viewBox="0 0 1000 700" preserveAspectRatio="none" aria-hidden="true"><path d="M140 185 C300 170 340 310 480 340"/><path d="M480 340 C650 300 690 145 860 175"/><path d="M480 340 C630 410 690 545 850 520"/></svg>
-        <div className="auth-cursor-label" style={{ left: `${authPointer.x}%`, top: `${authPointer.y}%` }}><span /> INSPECTING</div>
-        <div className="auth-visual-copy"><span>CODEFORENSIC / INTERACTIVE EVIDENCE ENGINE</span><h2>Your cursor becomes the investigator.</h2><p>Move across the field. The forensic engine follows your attention through code, risk and relationships.</p><div><b>01</b> INGEST <i /> <b>02</b> TRACE <i /> <b>03</b> EXPLAIN</div></div>
+
       </aside>
       <div className="auth-brand">
         <Fingerprint size={30} />

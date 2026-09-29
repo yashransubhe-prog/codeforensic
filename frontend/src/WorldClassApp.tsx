@@ -7,7 +7,6 @@ import {
   Code2,
   FileCode2,
   Fingerprint,
-  Gauge,
   Globe2,
   GitBranch,
   LayoutDashboard,
@@ -15,7 +14,6 @@ import {
   Search,
   ShieldCheck,
   Upload,
-  Users,
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -658,9 +656,6 @@ function AIChat({ project }: { project: Project }) {
   );
 }
 
-function Metric({ label, value, detail, icon }: any) {
-  return <div className="metric"><div className="metric-label">{label}{icon}</div><strong>{value}</strong><span>{detail}</span></div>;
-}
 
 function Panel({ title, subtitle, children, full }: any) {
   return <section className={`panel ${full ? "full" : ""}`}><header><div><strong>{title}</strong><span>{subtitle}</span></div><div className="panel-code">LIVE DATA</div></header><div className="panel-content">{children}</div></section>;

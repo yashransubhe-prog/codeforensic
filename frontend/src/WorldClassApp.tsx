@@ -319,6 +319,15 @@ function AuthScreen({ onSuccess }: { onSuccess: (user: any) => void }) {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [authPointer, setAuthPointer] = useState({ x: 50, y: 50 });
+
+  function trackAuthPointer(event: React.PointerEvent<HTMLDivElement>) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    setAuthPointer({
+      x: Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100)),
+      y: Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100)),
+    });
+  }
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -338,11 +347,24 @@ function AuthScreen({ onSuccess }: { onSuccess: (user: any) => void }) {
   }
 
   return (
-    <div className="auth-page">
+    <div className="auth-page" onPointerMove={trackAuthPointer} style={{ "--ax": `${authPointer.x}%`, "--ay": `${authPointer.y}%` } as React.CSSProperties}>
       <aside className="auth-visual">
-        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1800&q=88" alt="Real technology workspace" />
-        <div className="auth-visual-shade" />
-        <div className="auth-visual-copy"><span>CODEFORENSIC / LIVE INTELLIGENCE</span><h2>Find the evidence hiding inside software.</h2><p>Repository intelligence · security evidence · dependency maps · website X-Ray</p><div><b>01</b> IMPORT <i /> <b>02</b> TRACE <i /> <b>03</b> EXPLAIN</div></div>
+        <div className="auth-mesh" />
+        <div className="auth-scanner" />
+        <div className="auth-orbit orbit-a" /><div className="auth-orbit orbit-b" />
+        <div className="auth-core">
+          <div className="core-ring ring-1" /><div className="core-ring ring-2" />
+          <Fingerprint size={54} />
+          <span>CF</span>
+        </div>
+        <div className="auth-eye eye-left"><i style={{ transform: `translate(calc((${authPointer.x} - 50) * .09px), calc((${authPointer.y} - 50) * .07px))` }} /></div>
+        <div className="auth-eye eye-right"><i style={{ transform: `translate(calc((${authPointer.x} - 50) * .09px), calc((${authPointer.y} - 50) * .07px))` }} /></div>
+        <div className="auth-file file-a"><Code2 size={15}/><span>server.ts</span><b>TRACE</b></div>
+        <div className="auth-file file-b"><ShieldCheck size={15}/><span>security</span><b>SCAN</b></div>
+        <div className="auth-file file-c"><Boxes size={15}/><span>dependency</span><b>MAP</b></div>
+        <svg className="auth-links" viewBox="0 0 1000 700" preserveAspectRatio="none" aria-hidden="true"><path d="M140 185 C300 170 340 310 480 340"/><path d="M480 340 C650 300 690 145 860 175"/><path d="M480 340 C630 410 690 545 850 520"/></svg>
+        <div className="auth-cursor-label" style={{ left: `${authPointer.x}%`, top: `${authPointer.y}%` }}><span /> INSPECTING</div>
+        <div className="auth-visual-copy"><span>CODEFORENSIC / INTERACTIVE EVIDENCE ENGINE</span><h2>Your cursor becomes the investigator.</h2><p>Move across the field. The forensic engine follows your attention through code, risk and relationships.</p><div><b>01</b> INGEST <i /> <b>02</b> TRACE <i /> <b>03</b> EXPLAIN</div></div>
       </aside>
       <div className="auth-brand">
         <Fingerprint size={30} />
@@ -413,7 +435,7 @@ function Overview({ project, totalLines, highFindings }: { project: Project; tot
       </div>
       <div className="dashboard-grid">
         <Panel title="Architecture Intelligence" subtitle="Interactive repository topology" full>
-          <DependencyGraph dependencies={project.dependencies} />
+          <DependencyGraph dependencies={project.dependencies} files={project.files} />
         </Panel>
         <Panel title="Priority Evidence" subtitle="Highest-priority findings">
           <FindingList findings={project.findings.slice(0, 8)} />

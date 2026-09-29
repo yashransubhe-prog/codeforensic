@@ -52,22 +52,18 @@ type Page =
 const API = "https://codeforensic.onrender.com";
 
 const NAV = [
-  ["investigation", "Investigation", Fingerprint],
-  ["overview", "Overview", LayoutDashboard],
-  ["dna", "Project DNA", Code2],
-  ["timeline", "Git Timeline", GitBranch],
-  ["contributors", "Contributors", Users],
-  ["dependencies", "Dependency Graph", Boxes],
-  ["security", "Cyber Safe", ShieldCheck],
-  ["impact", "Impact Analysis", Activity],
-  ["performance", "Performance", Gauge],
-  ["website", "Web Audit", Globe2],
+  ["overview", "Command Center", LayoutDashboard],
+  ["investigation", "Evidence Explorer", Fingerprint],
+  ["dependencies", "Dependency Map", Boxes],
+  ["security", "Security", ShieldCheck],
+  ["website", "Website X-Ray", Globe2],
+  ["timeline", "Change History", GitBranch],
   ["ai", "Forensic AI", Bot],
 ] as const;
 
 export default function WorldClassApp() {
   const [user, setUser] = useState(storage.user());
-  const [page, setPage] = useState<Page>("investigation");
+  const [page, setPage] = useState<Page>("overview");
   const [project, setProject] = useState<Project | null>(null);
   const [projects, setProjects] = useState<any[]>([]);
   const [importOpen, setImportOpen] = useState(false);
@@ -124,7 +120,7 @@ export default function WorldClassApp() {
       const result = await importProject(file);
       setProject(result.project);
       setImportOpen(false);
-      setPage("investigation");
+      setPage("overview");
       await refreshProjects(result.project.id);
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Repository analysis failed");
@@ -140,7 +136,7 @@ export default function WorldClassApp() {
       const result = await importGithubProject(url);
       setProject(result.project);
       setImportOpen(false);
-      setPage("investigation");
+      setPage("overview");
       await refreshProjects(result.project.id);
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "GitHub analysis failed");
@@ -169,7 +165,7 @@ export default function WorldClassApp() {
           </div>
         </div>
 
-        <div className="rail-label">FORENSIC WORKSPACE</div>
+        <div className="rail-label">INVESTIGATION WORKSPACE</div>
         <nav>
           {NAV.map(([id, label, Icon]) => (
             <button
@@ -222,7 +218,7 @@ export default function WorldClassApp() {
           <div className="command-actions">
             <div className="command-search">
               <Search size={14} />
-              <span>Search evidence, files, findings...</span>
+              <span>Search this investigation...</span>
               <kbd>CTRL K</kbd>
             </div>
             <button className="theme-toggle" title="Toggle light/dark mode" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>{theme === "dark" ? "☀" : "☾"}</button>
@@ -234,9 +230,9 @@ export default function WorldClassApp() {
           {page !== "investigation" && (
             <div className="workspace-title">
               <div>
-                <div className="section-code">CF / LIVE PROJECT INTELLIGENCE</div>
+                <div className="section-code">CODEFORENSIC / ACTIVE INVESTIGATION</div>
                 <h1>{project ? project.name : "Forensic Workspace"}</h1>
-                <p>Real repository evidence, security signals, architecture and change intelligence.</p>
+                <p>Understand what is inside this project, what needs attention, what it affects, and why.</p>
               </div>
               <div className="workspace-actions">
                 <select
@@ -281,7 +277,7 @@ export default function WorldClassApp() {
               )}
 
               {page === "investigation" && <ForensicWorkbench project={project} />}
-              {page === "overview" && <Overview project={project} totalLines={totalLines} highFindings={highFindings} />}
+              {page === "overview" && <Overview project={project} totalLines={totalLines} highFindings={highFindings} onNavigate={setPage} />}
               {page === "dna" && <ProjectDNA project={project} />}
               {page === "timeline" && <Timeline project={project} />}
               {page === "contributors" && <Contributors project={project} />}
@@ -441,25 +437,53 @@ function AuthScreen({ onSuccess }: { onSuccess: (user: any) => void }) {
   );
 }
 
-function Overview({ project, totalLines, highFindings }: { project: Project; totalLines: number; highFindings: number }) {
+function Overview({ project, totalLines, highFindings, onNavigate }: { project: Project; totalLines: number; highFindings: number; onNavigate: (page: Page) => void }) {
   const maxRisk = project.riskScores.length ? Math.max(...project.riskScores.map((risk) => risk.score)) : 0;
+  const topFinding = project.findings.find((f) => ["critical","high"].includes(f.severity.toLowerCase())) || project.findings[0];
+  const connectedFiles = new Set(project.dependencies.flatMap((d) => [d.sourceFile,d.targetFile])).size;
+  const health = Math.max(0, Math.min(100, Math.round(100 - maxRisk * .55 - Math.min(25, highFindings * 6))));
+  const nextAction = topFinding ? `Review ${topFinding.type} in ${topFinding.filePath.split("/").pop()}` : project.dependencies.length ? "Explore the dependency map to understand architecture" : "Review indexed files and repository structure";
   return (
-    <>
-      <div className="metric-grid">
-        <Metric label="SOURCE FILES" value={project.files.length} detail={`${totalLines.toLocaleString()} lines indexed`} icon={<FileCode2 size={16} />} />
-        <Metric label="DEPENDENCIES" value={project.dependencies.length} detail="Internal file relationships" icon={<Boxes size={16} />} />
-        <Metric label="SECURITY FINDINGS" value={project.findings.length} detail={`${highFindings} high priority`} icon={<ShieldCheck size={16} />} />
-        <Metric label="MAX FILE RISK" value={`${maxRisk}/100`} detail="Highest calculated exposure" icon={<Activity size={16} />} />
+    <div className="command-center">
+      <section className="cc-hero">
+        <div>
+          <span className="cc-eyebrow">INVESTIGATION SUMMARY</span>
+          <h2>Here is what CodeForensic found.</h2>
+          <p>This page turns the scan into decisions: what needs attention, where it lives, and what to inspect next.</p>
+        </div>
+        <div className="cc-health"><span>PROJECT HEALTH</span><strong>{health}</strong><small>/100</small></div>
+      </section>
+
+      <section className="cc-priority">
+        <div className="cc-priority-icon"><Activity size={20}/></div>
+        <div><span>RECOMMENDED NEXT STEP</span><strong>{nextAction}</strong><p>{topFinding ? "A detected finding has evidence and remediation guidance ready to review." : "No high-priority finding is currently available, so start with architecture evidence."}</p></div>
+        <button onClick={() => onNavigate(topFinding ? "security" : "dependencies")}>Investigate <ChevronRight size={16}/></button>
+      </section>
+
+      <div className="cc-kpis">
+        <button onClick={() => onNavigate("investigation")}><span>CODEBASE</span><strong>{project.files.length}</strong><p>files · {totalLines.toLocaleString()} lines</p><small>Browse evidence →</small></button>
+        <button onClick={() => onNavigate("security")} className={highFindings ? "attention" : ""}><span>SECURITY</span><strong>{project.findings.length}</strong><p>{highFindings} high-priority findings</p><small>Review findings →</small></button>
+        <button onClick={() => onNavigate("dependencies")}><span>ARCHITECTURE</span><strong>{project.dependencies.length}</strong><p>verified links · {connectedFiles} connected files</p><small>Open map →</small></button>
+        <button onClick={() => onNavigate("timeline")}><span>CHANGE HISTORY</span><strong>{project.commits.length}</strong><p>commits recovered</p><small>Trace changes →</small></button>
       </div>
-      <div className="dashboard-grid">
-        <Panel title="Architecture Intelligence" subtitle="Interactive repository topology" full>
-          <DependencyGraph dependencies={project.dependencies} files={project.files} />
-        </Panel>
-        <Panel title="Priority Evidence" subtitle="Highest-priority findings">
-          <FindingList findings={project.findings.slice(0, 8)} />
-        </Panel>
+
+      <div className="cc-grid">
+        <section className="cc-explain">
+          <header><div><span>START HERE</span><h3>What can I do with this project?</h3></div></header>
+          <div className="cc-actions">
+            <button onClick={() => onNavigate("security")}><ShieldCheck/><div><strong>Find risky code</strong><p>See the exact file, line, evidence, why it matters and how to fix it.</p></div><ChevronRight/></button>
+            <button onClick={() => onNavigate("dependencies")}><Boxes/><div><strong>Understand relationships</strong><p>See which files depend on each other and trace a change's direct impact.</p></div><ChevronRight/></button>
+            <button onClick={() => onNavigate("timeline")}><GitBranch/><div><strong>Trace who changed what</strong><p>Use recovered Git history to connect commits and contributors to the codebase.</p></div><ChevronRight/></button>
+            <button onClick={() => onNavigate("ai")}><Bot/><div><strong>Ask the repository</strong><p>Ask plain-language questions and get answers grounded in this project's evidence.</p></div><ChevronRight/></button>
+          </div>
+        </section>
+        <section className="cc-evidence">
+          <header><span>TOP EVIDENCE</span><h3>Needs attention</h3><p>Highest-priority observations from this scan.</p></header>
+          <FindingList findings={project.findings.slice(0,5)} onSelect={() => onNavigate("security")} />
+          {!project.findings.length && <NoData text="No security findings detected in this scan."/>}
+        </section>
       </div>
-    </>
+    </div>
   );
 }
 

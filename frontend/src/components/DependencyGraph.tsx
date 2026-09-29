@@ -261,7 +261,7 @@ export default function DependencyGraph({ dependencies, files = [] }: Props) {
           id: `edge-${i}-${e.sourceFile}-${e.targetFile}`,
           source: e.sourceFile,
           target: e.targetFile,
-          animated: active,
+          animated: Boolean(focus && active),
           type: "smoothstep",
           markerEnd: {
             type: MarkerType.ArrowClosed,
@@ -289,7 +289,7 @@ export default function DependencyGraph({ dependencies, files = [] }: Props) {
     <div className="graph-shell cf-live-graph">
       <div className="graph-toolbar">
         <Network size={16} />
-        <strong>{paths.length} FILES · {links.length} VERIFIED IMPORT LINKS</strong>
+        <strong>{paths.length} FILES · {links.length} VERIFIED RELATIONSHIPS</strong>
         <div className="graph-search">
           <Search size={13} />
           <input
@@ -311,8 +311,8 @@ export default function DependencyGraph({ dependencies, files = [] }: Props) {
         <span><i className="high" /> High risk</span>
         <span><i className="medium" /> Medium risk</span>
         <span><i className="low" /> Low/no risk</span>
-        <span className="line-key">→ verified import direction</span>
-        <span className="accuracy-note">Unconnected files are still shown — no fake dependencies are invented.</span>
+        <span className="line-key">→ arrow points to the imported file</span>
+        <span className="accuracy-note">Only relationships found in the repository are connected. Click a file to trace its direct neighbors.</span>
       </div>
 
       <div className="dependency-canvas cf-live-canvas">
@@ -340,7 +340,7 @@ export default function DependencyGraph({ dependencies, files = [] }: Props) {
             maskColor="rgba(3,9,14,.78)"
           />
         </ReactFlow>
-        <div className="cf-live-badge"><span /> LIVE TOPOLOGY · DRAG · ZOOM · PAN · CLICK TO TRACE</div>
+        <div className="cf-live-badge"><span /> INTERACTIVE MAP · CLICK A FILE TO TRACE · DRAG TO REPOSITION · SCROLL TO ZOOM</div>
       </div>
     </div>
   );

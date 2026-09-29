@@ -348,25 +348,41 @@ function AuthScreen({ onSuccess }: { onSuccess: (user: any) => void }) {
 
   return (
     <div className="auth-page" onPointerMove={trackAuthPointer} style={{ "--ax": `${authPointer.x}%`, "--ay": `${authPointer.y}%` } as React.CSSProperties}>
-      <aside className="auth-visual" style={{ display: "block", visibility: "visible", opacity: 1, position: "relative", width: "100%", height: "calc(100vh - 36px)", minHeight: 620, overflow: "hidden", borderRadius: 28, background: "#080b11", border: "1px solid #182131", zIndex: 10 }}>
-        {/* Inline-rendered stage: intentionally independent of brand.css so it cannot disappear through cascade/breakpoints. */}
-        <div style={{ position: "absolute", inset: 0, zIndex: 20, overflow: "hidden", color: "#fff", pointerEvents: "none", background: `radial-gradient(circle at ${authPointer.x}% ${authPointer.y}%, rgba(124,92,255,.25), transparent 24%), linear-gradient(rgba(110,231,183,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(110,231,183,.055) 1px, transparent 1px)`, backgroundSize: "auto, 42px 42px, 42px 42px" }}>
-          <div style={{ position: "absolute", left: `${authPointer.x}%`, top: `${authPointer.y}%`, width: 190, height: 190, borderRadius: "50%", border: "1px solid rgba(110,231,183,.35)", transform: "translate(-50%,-50%)", boxShadow: "0 0 70px rgba(110,231,183,.12)", transition: "left 80ms linear, top 80ms linear" }} />
-          <div style={{ position: "absolute", left: "50%", top: "39%", width: 154, height: 154, transform: "translate(-50%,-50%)", borderRadius: "50%", display: "grid", placeItems: "center", border: "1px solid rgba(139,92,246,.65)", boxShadow: "0 0 80px rgba(139,92,246,.22)", background: "rgba(10,14,23,.88)" }}>
-            <Fingerprint size={58} color="#6ee7b7" />
-            <span style={{ position: "absolute", bottom: 22, fontSize: 9, letterSpacing: ".25em", color: "#a7f3d0" }}>FORENSIC CORE</span>
+      <aside className="auth-visual" style={{ display: "block", visibility: "visible", opacity: 1, position: "relative", width: "100%", height: "calc(100vh - 36px)", minHeight: 620, overflow: "hidden", borderRadius: 28, background: "#06090f", border: "1px solid #182131", zIndex: 10 }}>
+        <div className="forensic-stage" style={{ "--mx": `${authPointer.x}%`, "--my": `${authPointer.y}%` } as React.CSSProperties}>
+          <div className="fs-grid" />
+          <div className="fs-aurora" />
+          <div className="fs-scanline" />
+          <div className="fs-reticle" />
+          <svg className="fs-links" viewBox="0 0 1000 700" preserveAspectRatio="none" aria-hidden="true">
+            <path className="p1" d="M160 205 C300 205 330 315 470 345" />
+            <path className="p2" d="M470 345 C635 320 700 190 850 205" />
+            <path className="p3" d="M470 345 C625 390 690 520 845 510" />
+            <circle cx="470" cy="345" r="5" /><circle cx="160" cy="205" r="4" /><circle cx="850" cy="205" r="4" /><circle cx="845" cy="510" r="4" />
+          </svg>
+
+          <div className="fs-node fs-node-code"><Code2 size={17}/><div><b>server.ts</b><span>ENTRY EVIDENCE</span></div><em>TRACE</em></div>
+          <div className="fs-node fs-node-sec"><ShieldCheck size={17}/><div><b>security</b><span>4 SIGNALS</span></div><em>SCAN</em></div>
+          <div className="fs-node fs-node-dep"><Boxes size={17}/><div><b>dependency</b><span>IMPACT PATH</span></div><em>MAP</em></div>
+
+          <div className="fs-core">
+            <div className="fs-ring r1"/><div className="fs-ring r2"/><div className="fs-ring r3"/>
+            <div className="fs-eye e1"><i style={{ transform: `translate(${(authPointer.x-50)*0.10}px,${(authPointer.y-50)*0.08}px)` }}/></div>
+            <div className="fs-eye e2"><i style={{ transform: `translate(${(authPointer.x-50)*0.10}px,${(authPointer.y-50)*0.08}px)` }}/></div>
+            <Fingerprint size={62}/>
+            <strong>CF</strong><small>FORENSIC CORE</small>
           </div>
-          <div style={{ position: "absolute", left: "25%", top: "25%", padding: "12px 16px", border: "1px solid #263246", borderRadius: 12, background: "rgba(13,18,28,.94)", fontSize: 12 }}><Code2 size={15}/> server.ts <b style={{ color: "#6ee7b7", marginLeft: 8 }}>TRACE</b></div>
-          <div style={{ position: "absolute", right: "18%", top: "23%", padding: "12px 16px", border: "1px solid #263246", borderRadius: 12, background: "rgba(13,18,28,.94)", fontSize: 12 }}><ShieldCheck size={15}/> security <b style={{ color: "#fbbf24", marginLeft: 8 }}>SCAN</b></div>
-          <div style={{ position: "absolute", right: "20%", top: "54%", padding: "12px 16px", border: "1px solid #263246", borderRadius: 12, background: "rgba(13,18,28,.94)", fontSize: 12 }}><Boxes size={15}/> dependency <b style={{ color: "#a78bfa", marginLeft: 8 }}>MAP</b></div>
-          <div style={{ position: "absolute", left: `calc(${authPointer.x}% + 18px)`, top: `calc(${authPointer.y}% + 18px)`, padding: "7px 10px", borderRadius: 8, background: "#6ee7b7", color: "#07100d", fontSize: 9, fontWeight: 900, letterSpacing: ".14em", transition: "left 80ms linear, top 80ms linear" }}>INSPECTING</div>
-          <div style={{ position: "absolute", left: "7%", right: "7%", bottom: "8%" }}>
-            <div style={{ fontSize: 10, letterSpacing: ".22em", color: "#6ee7b7", fontWeight: 800 }}>CODEFORENSIC / LIVE EVIDENCE ENGINE</div>
-            <h2 style={{ margin: "14px 0 10px", maxWidth: 650, fontSize: "clamp(36px,4vw,68px)", lineHeight: .94, letterSpacing: "-.055em" }}>Move. Trace. Reveal.</h2>
-            <p style={{ margin: 0, maxWidth: 570, color: "#94a3b8", fontSize: 14 }}>Your pointer actively probes the forensic field — following code, security signals and dependency evidence in real time.</p>
+
+          <div className="fs-pulse pulse-a"/><div className="fs-pulse pulse-b"/><div className="fs-pulse pulse-c"/>
+          <div className="fs-pointer"><span/>INSPECTING</div>
+
+          <div className="fs-copy">
+            <span>CODEFORENSIC / LIVE INVESTIGATION ENGINE</span>
+            <h2>Evidence moves<br/>when you do.</h2>
+            <p>Move your cursor across the field to trace code, security signals and dependency paths.</p>
+            <div className="fs-steps"><b>01</b> INGEST <i/><b>02</b> TRACE <i/><b>03</b> EXPLAIN</div>
           </div>
         </div>
-
       </aside>
       <div className="auth-brand">
         <Fingerprint size={30} />

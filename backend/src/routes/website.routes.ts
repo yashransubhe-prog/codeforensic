@@ -22,6 +22,7 @@ async function assertPublic(target: URL) {
 }
 function has(html: string, pattern: RegExp) { return pattern.test(html); }
 function count(html: string, pattern: RegExp) { return (html.match(pattern) || []).length; }
+function textMatch(html:string, pattern:RegExp) { const m=html.match(pattern); return m?.[1]?.replace(/\s+/g," ").trim() || null; }
 
 async function nativeAudit(target: URL) {
   const started = performance.now();
@@ -50,10 +51,15 @@ async function nativeAudit(target: URL) {
       { id:"lang", title:"Page language", ok: has(html, /<html[^>]+lang=["'][^"']+/i), detail:"Declare the document language for accessibility." },
       { id:"h1", title:"Primary heading", ok: count(html, /<h1\b/gi) > 0, detail:"Use a clear H1 for page structure." },
       { id:"alt", title:"Image alternative text", ok: !has(html, /<img\b(?![^>]*\balt=)[^>]*>/i), detail:"Images should provide alt text where meaningful." },
+      { id:"referrer", title:"Referrer Policy", ok: Boolean(headers.get("referrer-policy")), detail:"A Referrer-Policy limits information shared when visitors follow links." },
+      { id:"permissions", title:"Permissions Policy", ok: Boolean(headers.get("permissions-policy")), detail:"Permissions-Policy can restrict sensitive browser capabilities." },
+      { id:"canonical", title:"Canonical URL", ok: has(html, /<link[^>]+rel=["'][^"']*canonical[^"']*["']/i), detail:"A canonical URL helps search engines understand the preferred page address." },
+      { id:"robots", title:"Robots guidance", ok: has(html, /<meta[^>]+name=["']robots["']/i) || has(html, /<meta[^>]+name=["']googlebot["']/i), detail:"Explicit robots guidance makes indexing intent easier to audit." },
+      { id:"og", title:"Social sharing metadata", ok: has(html, /<meta[^>]+property=["']og:/i), detail:"Open Graph metadata improves how pages appear when shared." },
     ];
     const passed = checks.filter(c => c.ok).length;
-    const securityChecks = checks.slice(0,5);
-    const contentChecks = checks.slice(5);
+    const securityChecks = checks.filter(c=>["https","csp","hsts","frame","nosniff","referrer","permissions"].includes(c.id));
+    const contentChecks = checks.filter(c=>["title","description","viewport","lang","h1","alt","canonical","robots","og"].includes(c.id));
     const security = Math.round(securityChecks.filter(c=>c.ok).length / securityChecks.length * 100);
     const seo = Math.round(contentChecks.filter(c=>c.ok).length / contentChecks.length * 100);
     const performanceScore = Math.max(0, Math.min(100, Math.round(100 - Math.max(0, ttfb - 250) / 20 - Math.max(0, bytes - 500_000) / 50_000)));
@@ -70,6 +76,26 @@ async function nativeAudit(target: URL) {
       },
       opportunities: checks.filter(c=>!c.ok).map(c=>({ id:c.id, title:c.title, description:c.detail })),
       checks,
+      details: {
+        response: {
+          finalUrl: response.url, status: response.status, statusText: response.statusText,
+          contentType: headers.get("content-type"), server: headers.get("server"),
+          cacheControl: headers.get("cache-control"), contentEncoding: headers.get("content-encoding")
+        },
+        securityHeaders: {
+          csp: headers.get("content-security-policy"), hsts: headers.get("strict-transport-security"),
+          xFrameOptions: headers.get("x-frame-options"), xContentTypeOptions: headers.get("x-content-type-options"),
+          referrerPolicy: headers.get("referrer-policy"), permissionsPolicy: headers.get("permissions-policy")
+        },
+        document: {
+          title: textMatch(html, /<title[^>]*>([^<]+)<\/title>/i),
+          h1: textMatch(html, /<h1[^>]*>([\s\S]*?)<\/h1>/i)?.replace(/<[^>]+>/g,"").trim() || null,
+          language: textMatch(html, /<html[^>]+lang=["']([^"']+)/i),
+          images: count(html, /<img\b/gi), imagesMissingAlt: count(html, /<img\b(?![^>]*\balt=)[^>]*>/gi),
+          links: count(html, /<a\b/gi), scripts: count(html, /<script\b/gi), forms: count(html, /<form\b/gi),
+          headings: count(html, /<h[1-6]\b/gi)
+        }
+      },
       probe: { status: response.status, ttfbMs: ttfb, totalMs, htmlBytes: bytes, passed, total: checks.length },
     };
   } finally { clearTimeout(timer); }

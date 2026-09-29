@@ -680,7 +680,7 @@ function BackgroundMonitor({ open, onToggle, project }: { open:boolean; onToggle
   const [samples,setSamples]=useState<number[]>([]);
   useEffect(()=>{
     if(!running)return;
-    let raf=0,frames=0,last=performance.now(),sampleStart=last;
+    let raf=0,frames=0,last=performance.now();
     const tick=(now:number)=>{frames++;if(now-last>=1000){const value=Math.round(frames*1000/(now-last));setFps(value);setSamples(v=>[...v.slice(-19),value]);frames=0;last=now;}raf=requestAnimationFrame(tick)};raf=requestAnimationFrame(tick);
     const PerfObs=(window as any).PerformanceObserver;let observer:any;
     try{observer=new PerfObs((list:any)=>setLongTasks((v)=>v+list.getEntries().length));observer.observe({entryTypes:["longtask"]});}catch{}

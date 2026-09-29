@@ -151,6 +151,13 @@ export async function importGithubProject(url: string) {
   };
 }
 
+export async function analyzeWebsite(url: string, strategy: "mobile" | "desktop" = "mobile") {
+  return request<any>("/website/analyze", {
+    method: "POST",
+    body: JSON.stringify({ url, strategy }),
+  });
+}
+
 export async function askAI(
   message: string,
   projectId?: string

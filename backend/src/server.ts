@@ -10,6 +10,7 @@ import authRoutes from "./routes/auth.routes";
 import aiRoutes from "./routes/ai.routes";
 import projectRoutes from "./routes/project.routes";
 import intelligenceRoutes from "./routes/intelligence.routes";
+import websiteRoutes from "./routes/website.routes";
 import githubRoutes from "./routes/github.routes";
 
 import { requireAuth } from "./middleware/auth.middleware";
@@ -55,6 +56,7 @@ app.use("/api/projects", requireAuth, projectRoutes);
 app.use("/api/github", requireAuth, githubRoutes);
 app.use("/api/ai", requireAuth, aiRoutes);
 app.use("/api/intelligence", requireAuth, intelligenceRoutes);
+app.use("/api/website", requireAuth, websiteRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({ success: false, message: "API route not found" });

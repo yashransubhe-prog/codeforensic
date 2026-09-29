@@ -1,4 +1,4 @@
-import { Activity, AlertTriangle, CheckCircle2, Gauge, Globe2, Info, RefreshCw, Search, ShieldCheck, TimerReset, Zap } from "lucide-react";
+import { Activity, AlertTriangle, CheckCircle2, Gauge, Globe2, Info, RefreshCw, Search, ShieldCheck, Zap } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { analyzeWebsite } from "../lib/api";
 

@@ -339,6 +339,11 @@ function AuthScreen({ onSuccess }: { onSuccess: (user: any) => void }) {
 
   return (
     <div className="auth-page">
+      <aside className="auth-visual">
+        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1800&q=88" alt="Real technology workspace" />
+        <div className="auth-visual-shade" />
+        <div className="auth-visual-copy"><span>CODEFORENSIC / LIVE INTELLIGENCE</span><h2>Find the evidence hiding inside software.</h2><p>Repository intelligence · security evidence · dependency maps · website X-Ray</p><div><b>01</b> IMPORT <i /> <b>02</b> TRACE <i /> <b>03</b> EXPLAIN</div></div>
+      </aside>
       <div className="auth-brand">
         <Fingerprint size={30} />
         <div>

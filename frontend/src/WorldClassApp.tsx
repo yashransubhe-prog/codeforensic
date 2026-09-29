@@ -1,5 +1,12 @@
 import {
   Activity,
+  Cpu,
+  HardDrive,
+  MonitorCog,
+  Play,
+  Pause,
+  Trash2,
+  Wifi,
   AlertTriangle,
   Bot,
   Boxes,
@@ -67,7 +74,10 @@ export default function WorldClassApp() {
   const [importOpen, setImportOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [monitorOpen, setMonitorOpen] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">(() => (localStorage.getItem("cf_theme") === "light" ? "light" : "dark"));
+
+  useEffect(() => { const go=(e:any)=>setPage(e.detail as Page); window.addEventListener("cf:navigate",go); return()=>window.removeEventListener("cf:navigate",go); },[]);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -214,6 +224,7 @@ export default function WorldClassApp() {
             <strong>{NAV.find(([id]) => id === page)?.[1]}</strong>
           </div>
           <div className="command-actions">
+            <button className={`background-monitor-trigger ${monitorOpen ? "active" : ""}`} onClick={() => setMonitorOpen(!monitorOpen)}><Activity size={14}/><span>Background Monitor</span><i/></button>
             <div className="command-search">
               <Search size={14} />
               <span>Search this investigation...</span>
@@ -293,6 +304,8 @@ export default function WorldClassApp() {
           )}
         </section>
       </main>
+
+      <BackgroundMonitor open={monitorOpen} onToggle={() => setMonitorOpen(!monitorOpen)} project={project} />
 
       {importOpen && (
         <ImportModal
@@ -656,6 +669,47 @@ function AIChat({ project }: { project: Project }) {
   );
 }
 
+
+function BackgroundMonitor({ open, onToggle, project }: { open:boolean; onToggle:()=>void; project:Project|null }) {
+  const [running,setRunning]=useState(true);
+  const [fps,setFps]=useState<number|null>(null);
+  const [longTasks,setLongTasks]=useState(0);
+  const [heap,setHeap]=useState<{used:number;limit:number}|null>(null);
+  const [deviceMemory,setDeviceMemory]=useState<number|null>(null);
+  const [online,setOnline]=useState(navigator.onLine);
+  const [samples,setSamples]=useState<number[]>([]);
+  useEffect(()=>{
+    if(!running)return;
+    let raf=0,frames=0,last=performance.now(),sampleStart=last;
+    const tick=(now:number)=>{frames++;if(now-last>=1000){const value=Math.round(frames*1000/(now-last));setFps(value);setSamples(v=>[...v.slice(-19),value]);frames=0;last=now;}raf=requestAnimationFrame(tick)};raf=requestAnimationFrame(tick);
+    const PerfObs=(window as any).PerformanceObserver;let observer:any;
+    try{observer=new PerfObs((list:any)=>setLongTasks((v)=>v+list.getEntries().length));observer.observe({entryTypes:["longtask"]});}catch{}
+    const timer=window.setInterval(()=>{const mem=(performance as any).memory;if(mem)setHeap({used:mem.usedJSHeapSize,limit:mem.jsHeapSizeLimit});const dm=(navigator as any).deviceMemory;if(dm)setDeviceMemory(dm);},1500);
+    const on=()=>setOnline(navigator.onLine);window.addEventListener("online",on);window.addEventListener("offline",on);
+    return()=>{cancelAnimationFrame(raf);observer?.disconnect();clearInterval(timer);window.removeEventListener("online",on);window.removeEventListener("offline",on)};
+  },[running]);
+  const avg=samples.length?Math.round(samples.reduce((a,b)=>a+b,0)/samples.length):null;
+  const heapPct=heap?Math.round(heap.used/heap.limit*100):null;
+  const findings=project?.findings.length||0, high=project?.findings.filter(f=>["high","critical"].includes(f.severity.toLowerCase())).length||0;
+  return <aside className={`bg-monitor ${open?"open":""}`} onMouseEnter={()=>{}} onClick={(e)=>e.stopPropagation()}>
+    <button className="bg-monitor-tab" onClick={onToggle}><Activity size={15}/><span>LIVE</span><i/></button>
+    <div className="bg-monitor-inner">
+      <header><div><small>LOCAL SESSION TELEMETRY</small><strong>Background Monitor</strong><p>Live measurements for this CodeForensic browser tab plus evidence from the active repository.</p></div><button onClick={()=>setRunning(!running)}>{running?<Pause/>:<Play/>}{running?"Pause":"Resume"}</button></header>
+      <div className="monitor-status"><span className={running?"pulse":""}/><b>{running?"MEASURING NOW":"PAUSED"}</b><em>{online?"Network online":"Network offline"}</em></div>
+      <div className="monitor-grid">
+        <div><MonitorCog/><span>RENDER RATE</span><strong>{fps??"—"} <small>FPS</small></strong><p>{avg? `${avg} FPS recent average`:"Collecting frames…"}</p></div>
+        <div><Cpu/><span>MAIN-THREAD PRESSURE</span><strong>{longTasks}</strong><p>Long tasks observed in this session. Lower is better.</p></div>
+        <div><HardDrive/><span>WEB-APP MEMORY</span><strong>{heapPct===null?"—":heapPct+"%"}</strong><p>{heap? `${(heap.used/1048576).toFixed(1)} MB JS heap in use`:"Browser does not expose JS heap telemetry."}</p></div>
+        <div><Wifi/><span>CONNECTIVITY</span><strong>{online?"ONLINE":"OFFLINE"}</strong><p>Browser network state, not an internet speed test.</p></div>
+      </div>
+      <section className="monitor-chart"><div><b>FRAME STABILITY</b><span>last {samples.length} seconds</span></div><div className="spark">{samples.map((v,i)=><i key={i} style={{height:`${Math.max(8,Math.min(100,v/60*100))}%`}}/>)}</div></section>
+      <section className="monitor-evidence"><h4>ACTIVE SOFTWARE EVIDENCE</h4><div><span>Repository</span><b>{project?.name||"No project selected"}</b></div><div><span>Indexed files</span><b>{project?.files.length??"—"}</b></div><div><span>Verified relationships</span><b>{project?.dependencies.length??"—"}</b></div><div><span>Security findings</span><b>{findings} total · {high} high priority</b></div><div><span>Approx. device RAM</span><b>{deviceMemory?deviceMemory+" GB":"Not exposed by browser"}</b></div></section>
+      <section className="monitor-truth"><ShieldCheck/><div><b>Capability boundary</b><p>Browser mode can measure this tab and analyze uploaded/web evidence. Full-device virus scanning, process cleanup, RAM clearing and system-wide optimization require a separately installed CodeForensic desktop agent with explicit OS permission.</p></div></section>
+      <div className="monitor-actions"><button onClick={()=>{performance.clearMarks();performance.clearMeasures();setLongTasks(0);setSamples([])}}><Trash2/>Clear telemetry history</button><button onClick={()=>setPageSafe("security")} disabled={!project}><ShieldCheck/>Open repository security</button></div>
+    </div>
+  </aside>;
+  function setPageSafe(target:string){window.dispatchEvent(new CustomEvent("cf:navigate",{detail:target}));onToggle();}
+}
 
 function Panel({ title, subtitle, children, full }: any) {
   return <section className={`panel ${full ? "full" : ""}`}><header><div><strong>{title}</strong><span>{subtitle}</span></div><div className="panel-code">LIVE DATA</div></header><div className="panel-content">{children}</div></section>;

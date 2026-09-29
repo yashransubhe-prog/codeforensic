@@ -6,6 +6,7 @@ import "./workbench.css";
 import "./landing.css";
 import "./polish.css";
 import "./mobile.css";
+import "./brand.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

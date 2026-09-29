@@ -1,57 +1,41 @@
-import { Activity, ArrowRight, Bot, Boxes, Code2, Fingerprint, GitBranch, Menu, ShieldCheck, Sparkles, X } from "lucide-react";
+import { Activity, ArrowRight, Bot, Boxes, Code2, Fingerprint, GitBranch, Globe2, Menu, ShieldCheck, Sparkles, X, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 
-const team = [
-  { name: "YASH", role: "Creator · Main Developer", lead: true },
-  { name: "MURLI", role: "Core Team Member" },
-  { name: "KALEB", role: "Core Team Member" },
-  { name: "USMAN", role: "Support Team" },
-  { name: "PARDHU", role: "Support Team" },
-  { name: "VIJAY", role: "Support Team" },
-  { name: "VARDHAN", role: "Support Team" },
-  { name: "REVENTH", role: "Support Team" },
-];
+const team=[{name:"YASH",role:"Creator · Main Developer",lead:true},{name:"MURLI",role:"Core Team Member"},{name:"KALEB",role:"Core Team Member"},{name:"USMAN",role:"Support Team"},{name:"PARDHU",role:"Support Team"},{name:"VIJAY",role:"Support Team"},{name:"VARDHAN",role:"Support Team"},{name:"REVENTH",role:"Support Team"}];
 
-export default function LandingPage({ onEnter }: { onEnter: () => void }) {
-  const [menu, setMenu] = useState(false);
-  const [pointer, setPointer] = useState({ x: 50, y: 30 });
+export default function LandingPage({onEnter}:{onEnter:()=>void}){
+ const [menu,setMenu]=useState(false); const [pointer,setPointer]=useState({x:50,y:30});
+ useEffect(()=>{const move=(e:PointerEvent)=>setPointer({x:e.clientX/window.innerWidth*100,y:e.clientY/window.innerHeight*100});window.addEventListener("pointermove",move);return()=>window.removeEventListener("pointermove",move)},[]);
+ const jump=(id:string)=>{document.getElementById(id)?.scrollIntoView({behavior:"smooth"});setMenu(false)};
+ return <div className="landing brand3" style={{"--mx":`${pointer.x}%`,"--my":`${pointer.y}%`} as React.CSSProperties}>
+  <div className="cursor-glow"/><header className="landing-nav"><button className="landing-brand" onClick={()=>jump("home")}><span><Fingerprint/></span><div><strong>CODEFORENSIC</strong><small>INVESTIGATE · TRACE · EXPLAIN</small></div></button><nav>{["platform","web-xray","workflow","team"].map(x=><button key={x} onClick={()=>jump(x)}>{x.replace("-"," ").toUpperCase()}</button>)}</nav><button className="enter-tool" onClick={onEnter}>ENTER PLATFORM <ArrowRight size={15}/></button><button className="mobile-menu" onClick={()=>setMenu(!menu)}>{menu?<X/>:<Menu/>}</button></header>
+  {menu&&<div className="landing-mobile-nav">{["platform","web-xray","workflow","team"].map(x=><button key={x} onClick={()=>jump(x)}>{x.replace("-"," ").toUpperCase()}</button>)}<button onClick={onEnter}>ENTER PLATFORM</button></div>}
+  <main>
+   <section id="home" className="hero hero-v3">
+    <div className="hero-copy"><div className="eyebrow"><span/> SOFTWARE INTELLIGENCE, REIMAGINED</div><h1>Don't just read code.<br/><em>See what it knows.</em></h1><p>Drop a ZIP, connect GitHub, or point at a live website. CodeForensic turns real technical evidence into a visual investigation anyone can understand.</p><div className="hero-actions"><button className="hero-primary" onClick={onEnter}>START AN INVESTIGATION <ArrowRight/></button><button className="hero-secondary" onClick={()=>jump("platform")}>SEE THE PLATFORM</button></div><div className="hero-proof"><span><i/> REAL REPOSITORY DATA</span><span><i/> NO DEMO SCORES</span><span><i/> EVIDENCE FIRST</span></div></div>
+    <div className="hero-stage">
+      <div className="stage-glow"/>
+      <div className="stage-window"><div className="stage-top"><div className="stage-dots"><i/><i/><i/></div><b>codeforensic / investigation</b><span>● ENGINE LIVE</span></div><div className="stage-body"><aside><Fingerprint/><i/><i/><i/><i/><i/></aside><section><div className="stage-title"><small>PROJECT INTELLIGENCE</small><strong>Your repository, explained.</strong></div><div className="stage-kpis"><div><small>FILES</small><b>LIVE</b></div><div><small>RISK</small><b>TRACED</b></div><div><small>GRAPH</small><b>MAPPED</b></div></div><div className="stage-map"><span className="node n1">App.tsx</span><span className="node n2">api.ts</span><span className="node n3 hot">server.ts</span><span className="node n4">auth.ts</span><svg viewBox="0 0 600 220" preserveAspectRatio="none"><path d="M110 55 C210 55 210 110 295 110"/><path d="M295 110 C390 110 380 55 485 55"/><path d="M295 110 C390 110 390 170 485 170"/></svg></div></section><div className="stage-evidence"><small>PRIORITY EVIDENCE</small><article><ShieldCheck/><div><b>Exact evidence</b><span>File · line · reason · fix</span></div></article><article><Activity/><div><b>Blast radius</b><span>Trace what a change affects</span></div></article><article><Bot/><div><b>Ask the repository</b><span>AI grounded in project context</span></div></article></div></div></div>
+      <div className="float-chip chip-a"><Zap/> LIVE ANALYSIS</div><div className="float-chip chip-b"><Globe2/> WEB X-RAY</div>
+    </div>
+   </section>
 
-  useEffect(() => {
-    const move = (e: PointerEvent) => setPointer({ x: e.clientX / window.innerWidth * 100, y: e.clientY / window.innerHeight * 100 });
-    window.addEventListener("pointermove", move);
-    return () => window.removeEventListener("pointermove", move);
-  }, []);
+   <section id="platform" className="landing-section platform-v3"><div className="section-kicker">01 / THE PLATFORM</div><div className="section-intro"><h2>One investigation surface.<br/><em>Many layers of truth.</em></h2><p>Simple at first glance. Deep when you need it. Every screen leads back to evidence.</p></div><div className="bento">
+    <article className="bento-main"><div><span className="bento-icon"><Boxes/></span><small>DEPENDENCY INTELLIGENCE</small><h3>Watch architecture become a map.</h3><p>Every indexed file can appear. Real import relationships become directional paths. Click one node and the noise fades away.</p></div><div className="mini-map"><span>A</span><span>B</span><span className="risk">C</span><span>D</span><i/><i/><i/></div></article>
+    <article className="bento-security"><span className="bento-icon"><ShieldCheck/></span><small>CYBER SAFE</small><h3>Risk without the mystery.</h3><div className="finding-demo"><b>HIGH</b><span>server.ts · line 84</span><p>Evidence → reason → impact → fix</p></div></article>
+    <article className="bento-ai"><span className="bento-icon"><Bot/></span><small>FORENSIC AI</small><h3>Ask your codebase.</h3><div className="ai-demo"><span>What should I investigate first?</span><b>↳ Grounded in repository evidence</b></div></article>
+    <article className="bento-git"><GitBranch/><div><small>GIT EVIDENCE</small><h3>Trace change back to people and commits.</h3></div></article>
+   </div></section>
 
-  const jump = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-    setMenu(false);
-  };
+   <section id="web-xray" className="landing-section web-story"><div className="web-story-photo"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1800&q=88" alt="Real laptop and technology workspace"/><div className="web-story-overlay"><span>NEW</span><strong>WEB X-RAY</strong></div></div><div className="web-story-copy"><div className="section-kicker">02 / LIVE WEBSITE INTELLIGENCE</div><h2>A website has evidence too.</h2><p>Enter a public URL and inspect real response time, delivery size, security headers, SEO signals and Lighthouse metrics when the provider is available.</p><div className="signal-list"><span><Globe2/> Public URL probe</span><span><Zap/> Response & transfer timing</span><span><ShieldCheck/> Security-header checks</span><span><Activity/> SEO & document evidence</span></div><button className="hero-primary" onClick={onEnter}>OPEN WEB X-RAY <ArrowRight/></button></div></section>
 
-  return <div className="landing" style={{ "--mx": `${pointer.x}%`, "--my": `${pointer.y}%` } as React.CSSProperties}>
-    <div className="landing-grid" /><div className="cursor-glow" />
-    <header className="landing-nav">
-      <button className="landing-brand" onClick={() => jump("home")}><span><Fingerprint /></span><div><strong>CODEFORENSIC</strong><small>INVESTIGATE · TRACE · EXPLAIN</small></div></button>
-      <nav>{["home", "capabilities", "workflow", "about", "team"].map((x) => <button key={x} onClick={() => jump(x)}>{x.toUpperCase()}</button>)}</nav>
-      <button className="enter-tool" onClick={onEnter}>OPEN TOOL <ArrowRight size={15} /></button>
-      <button className="mobile-menu" onClick={() => setMenu(!menu)}>{menu ? <X /> : <Menu />}</button>
-    </header>
-    {menu && <div className="landing-mobile-nav">{["home", "capabilities", "workflow", "about", "team"].map((x) => <button key={x} onClick={() => jump(x)}>{x.toUpperCase()}</button>)}<button onClick={onEnter}>OPEN TOOL</button></div>}
-    <main>
-      <section id="home" className="hero">
-        <div className="hero-orbit orbit-one" /><div className="hero-orbit orbit-two" />
-        <div className="eyebrow"><span /> SOFTWARE FORENSICS · LIVE REPOSITORY INTELLIGENCE</div>
-        <h1>Every change<br /><em>leaves evidence.</em></h1>
-        <p>CodeForensic turns a real software repository into an investigation surface — mapping architecture, dependencies, security evidence, risk, contributors and change impact in one place.</p>
-        <div className="hero-actions"><button className="hero-primary" onClick={onEnter}>START INVESTIGATION <ArrowRight /></button><button className="hero-secondary" onClick={() => jump("capabilities")}>EXPLORE PLATFORM</button></div>
-        <div className="hero-proof"><span><i /> REAL FILE ANALYSIS</span><span><i /> GITHUB + ZIP</span><span><i /> EVIDENCE-BACKED RISK</span></div>
-        <div className="hero-photo"><img src="https://images.unsplash.com/photo-1753715613434-9c7cb58876b9?auto=format&fit=crop&fm=jpg&q=82&w=1800" alt="Real software developer workstation with code on multiple monitors" /><div className="photo-shade" /><div className="photo-badge top"><span className="live-dot" /> LIVE REPOSITORY INTELLIGENCE</div><div className="photo-insight"><small>ONE WORKSPACE</small><strong>Code · Risk · Performance · Evidence</strong><span>Analyze repositories and public websites with real project data.</span></div></div>
-      </section>
-      <section id="capabilities" className="landing-section"><div className="section-kicker">01 / CAPABILITIES</div><h2>See the repository as<br />an investigation, not a folder.</h2><div className="feature-grid">{[[Fingerprint, "Project DNA", "Index files, languages, line counts and structural evidence from the actual repository."], [Boxes, "Dependency Skeleton", "Explore every indexed file and trace real import relationships, connections and blast radius."], [ShieldCheck, "Cyber Safe", "Find suspicious code patterns with exact file, line, evidence, explanation and remediation."], [Activity, "Impact Analysis", "Identify highly connected files and understand where a change can propagate."], [GitBranch, "Git Evidence", "Import public GitHub repositories and recover commit and contributor evidence."], [Bot, "Forensic AI", "Ask questions about the selected project with repository evidence supplied to the AI backend."]].map(([Icon, title, text]: any, i) => <article key={title}><span className="feature-no">0{i + 1}</span><Icon /><h3>{title}</h3><p>{text}</p><div className="feature-line" /></article>)}</div></section>
-      <section id="workflow" className="landing-section workflow"><div><div className="section-kicker">02 / WORKFLOW</div><h2>Import. Trace.<br />Understand.</h2><p>Upload a ZIP or connect a public GitHub repository. CodeForensic indexes the evidence and builds the investigation from the project itself — not fixed demo values.</p><button className="hero-primary" onClick={onEnter}>ANALYZE A REPOSITORY <ArrowRight /></button></div><div className="workflow-steps">{[["01", "INGEST", "ZIP archive or GitHub repository"], ["02", "INDEX", "Files, languages, LOC and metadata"], ["03", "TRACE", "Imports, security signals and risk"], ["04", "INVESTIGATE", "Graphs, evidence, impact and AI"]].map(([n, t, d]) => <div key={n}><b>{n}</b><span /><section><strong>{t}</strong><p>{d}</p></section></div>)}</div></section>
-      <section id="about" className="landing-section about"><div className="section-kicker">03 / ABOUT CODEFORENSIC</div><div className="about-grid"><h2>Built to explain<br />what code leaves behind.</h2><div><p>Modern repositories are difficult to understand from files alone. CodeForensic was created as a software-forensics workspace that connects architecture, security, history and impact into a single visual investigation.</p><p>Its principle is simple: <strong>Every change leaves evidence.</strong> The platform helps developers, reviewers and investigators follow that evidence back to the files and relationships that matter.</p><div className="about-values"><span>REAL DATA</span><span>TRACEABLE EVIDENCE</span><span>INTERACTIVE ANALYSIS</span><span>PROJECT-AWARE AI</span></div></div></div></section>
-      <section id="team" className="landing-section team"><div className="section-kicker">04 / CREATORS & TEAM</div><h2>The people behind<br />CodeForensic.</h2><div className="team-grid">{team.map((m, i) => <article className={m.lead ? "team-lead" : ""} key={m.name}><div className="member-index">CF-{String(i + 1).padStart(2, "0")}</div><div className="member-avatar">{m.name[0]}</div><div><h3>{m.name}</h3><p>{m.role}</p></div>{m.lead && <Sparkles size={17} />}</article>)}</div></section>
-      <section className="landing-cta"><Fingerprint /><div><span>READY TO INVESTIGATE?</span><h2>Trace the evidence inside your code.</h2></div><button className="hero-primary" onClick={onEnter}>GO TO TOOL <ArrowRight /></button></section>
-    </main>
-    <footer><div className="landing-brand"><span><Fingerprint /></span><div><strong>CODEFORENSIC</strong><small>INVESTIGATE · TRACE · EXPLAIN</small></div></div><p>Software Forensics & Repository Intelligence</p><span>CREATED BY YASH & CODEFORENSIC TEAM</span></footer>
-  </div>;
+   <section id="workflow" className="landing-section workflow-v3"><div className="section-kicker">03 / HOW IT THINKS</div><h2>From source to signal.</h2><div className="pipeline">{[["01","INGEST","ZIP · GitHub · Website",Code2],["02","UNDERSTAND","Files · imports · metadata",Fingerprint],["03","TRACE","Risk · evidence · impact",Activity],["04","EXPLAIN","Visuals · AI · actions",Sparkles]].map(([n,t,d,Icon]:any)=><article key={n}><b>{n}</b><Icon/><small>{t}</small><strong>{d}</strong></article>)}</div></section>
+
+   <section className="landing-section manifesto"><span>THE PRINCIPLE</span><h2>Every change leaves evidence.<br/><em>CodeForensic makes it visible.</em></h2><p>Not another dashboard full of numbers. A product designed to help a student, developer or reviewer understand what matters, where it lives, why it matters and what to do next.</p></section>
+
+   <section id="team" className="landing-section team team-v3"><div className="section-kicker">04 / THE BUILDERS</div><h2>Built by the CodeForensic team.</h2><div className="team-grid">{team.map((m,i)=><article className={m.lead?"team-lead":""} key={m.name}><div className="member-index">CF-{String(i+1).padStart(2,"0")}</div><div className="member-avatar">{m.name[0]}</div><div><h3>{m.name}</h3><p>{m.role}</p></div>{m.lead&&<Sparkles size={17}/>}</article>)}</div></section>
+   <section className="landing-cta cta-v3"><div><span>YOUR NEXT INVESTIGATION STARTS HERE</span><h2>Upload evidence. See the system.</h2></div><button className="hero-primary" onClick={onEnter}>ENTER CODEFORENSIC <ArrowRight/></button></section>
+  </main>
+  <footer><div className="landing-brand"><span><Fingerprint/></span><div><strong>CODEFORENSIC</strong><small>INVESTIGATE · TRACE · EXPLAIN</small></div></div><p>Software Forensics · Repository Intelligence · Web X-Ray</p><span>CREATED BY YASH & CODEFORENSIC TEAM</span></footer>
+ </div>
 }

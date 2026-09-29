@@ -348,7 +348,7 @@ function AuthScreen({ onSuccess }: { onSuccess: (user: any) => void }) {
 
   return (
     <div className="auth-page" onPointerMove={trackAuthPointer} style={{ "--ax": `${authPointer.x}%`, "--ay": `${authPointer.y}%` } as React.CSSProperties}>
-      <aside className="auth-visual" style={{ display: "block", position: "relative", minHeight: "calc(100vh - 36px)", overflow: "hidden", borderRadius: 28, background: "#080b11", border: "1px solid #182131" }}>
+      <aside className="auth-visual" style={{ display: "block", visibility: "visible", opacity: 1, position: "relative", width: "100%", height: "calc(100vh - 36px)", minHeight: 620, overflow: "hidden", borderRadius: 28, background: "#080b11", border: "1px solid #182131", zIndex: 10 }}>
         {/* Inline-rendered stage: intentionally independent of brand.css so it cannot disappear through cascade/breakpoints. */}
         <div style={{ position: "absolute", inset: 0, zIndex: 20, overflow: "hidden", color: "#fff", pointerEvents: "none", background: `radial-gradient(circle at ${authPointer.x}% ${authPointer.y}%, rgba(124,92,255,.25), transparent 24%), linear-gradient(rgba(110,231,183,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(110,231,183,.055) 1px, transparent 1px)`, backgroundSize: "auto, 42px 42px, 42px 42px" }}>
           <div style={{ position: "absolute", left: `${authPointer.x}%`, top: `${authPointer.y}%`, width: 190, height: 190, borderRadius: "50%", border: "1px solid rgba(110,231,183,.35)", transform: "translate(-50%,-50%)", boxShadow: "0 0 70px rgba(110,231,183,.12)", transition: "left 80ms linear, top 80ms linear" }} />

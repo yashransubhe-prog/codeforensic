@@ -121,3 +121,16 @@ html,body,#root{background:var(--cf-bg);color:var(--cf-text)}
   .auth-page{grid-template-columns:1fr!important}
   .auth-visual{display:none!important}
 }
+
+/* Auth 4.1 emergency visibility override — keep forensic experience visible on all non-mobile layouts */
+@media (min-width:701px){
+  .auth-page{display:grid!important;grid-template-columns:minmax(420px,1.15fr) minmax(390px,.85fr)!important}
+  .auth-visual{display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;min-width:0!important;min-height:calc(100vh - 24px)!important}
+  .auth-mesh,.auth-scanner,.auth-core,.auth-eye,.auth-file,.auth-links,.auth-visual-copy{visibility:visible!important;opacity:1}
+  .auth-core{display:grid!important}
+  .auth-eye{display:grid!important}
+  .auth-file{display:grid!important}
+  .auth-links{display:block!important}
+  .auth-visual-copy{display:block!important}
+}
+@media (max-width:700px){.auth-visual{display:none!important}}

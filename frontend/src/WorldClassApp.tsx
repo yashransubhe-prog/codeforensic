@@ -8,6 +8,7 @@ import {
   FileCode2,
   Fingerprint,
   Gauge,
+  Globe2,
   GitBranch,
   LayoutDashboard,
   LogOut,
@@ -22,6 +23,7 @@ import { useEffect, useMemo, useState } from "react";
 import DependencyGraph from "./components/DependencyGraph";
 import ForensicWorkbench from "./components/ForensicWorkbench";
 import PerformancePanel from "./components/PerformancePanel";
+import WebsiteAudit from "./components/WebsiteAudit";
 import {
   askAI,
   getProject,
@@ -44,6 +46,7 @@ type Page =
   | "security"
   | "impact"
   | "performance"
+  | "website"
   | "ai";
 
 const API = "https://codeforensic.onrender.com";
@@ -58,6 +61,7 @@ const NAV = [
   ["security", "Cyber Safe", ShieldCheck],
   ["impact", "Impact Analysis", Activity],
   ["performance", "Performance", Gauge],
+  ["website", "Web Audit", Globe2],
   ["ai", "Forensic AI", Bot],
 ] as const;
 
@@ -69,6 +73,12 @@ export default function WorldClassApp() {
   const [importOpen, setImportOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [theme, setTheme] = useState<"dark" | "light">(() => (localStorage.getItem("cf_theme") === "light" ? "light" : "dark"));
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("cf_theme", theme);
+  }, [theme]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -215,6 +225,7 @@ export default function WorldClassApp() {
               <span>Search evidence, files, findings...</span>
               <kbd>CTRL K</kbd>
             </div>
+            <button className="theme-toggle" title="Toggle light/dark mode" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>{theme === "dark" ? "☀" : "☾"}</button>
             <div className="local-status"><span /> ENGINE ONLINE</div>
           </div>
         </header>
@@ -276,12 +287,13 @@ export default function WorldClassApp() {
               {page === "contributors" && <Contributors project={project} />}
               {page === "dependencies" && (
                 <Panel title="Repository Dependency Topology" subtitle={`${project.dependencies.length} real relationships`} full>
-                  <DependencyGraph dependencies={project.dependencies} />
+                  <DependencyGraph dependencies={project.dependencies} files={project.files} />
                 </Panel>
               )}
               {page === "security" && <Security project={project} />}
               {page === "impact" && <Impact project={project} />}
               {page === "performance" && <PerformancePanel project={project} />}
+              {page === "website" && <WebsiteAudit />}
               {page === "ai" && <AIChat project={project} />}
             </>
           )}

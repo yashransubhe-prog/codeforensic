@@ -134,3 +134,13 @@ html,body,#root{background:var(--cf-bg);color:var(--cf-text)}
   .auth-visual-copy{display:block!important}
 }
 @media (max-width:700px){.auth-visual{display:none!important}}
+
+/* Auth final layout authority */
+.auth-page{display:grid!important;grid-template-columns:minmax(520px,58vw) minmax(420px,1fr)!important;min-height:100vh!important;width:100%!important}
+.auth-page>.auth-visual{display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;height:calc(100vh - 36px)!important;min-height:620px!important;grid-column:1!important}
+.auth-page>.auth-card{grid-column:2!important}
+@media(max-width:900px){
+ .auth-page{grid-template-columns:1fr!important}
+ .auth-page>.auth-visual{display:none!important}
+ .auth-page>.auth-card{grid-column:1!important}
+}

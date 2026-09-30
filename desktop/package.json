@@ -1,0 +1,5 @@
+{
+  "name":"codeforensic-desktop-agent","version":"0.1.0","private":true,"main":"main.cjs",
+  "scripts":{"start":"electron .","dev":"electron ."},
+  "devDependencies":{"electron":"^38.0.0"}
+}

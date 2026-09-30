@@ -1,0 +1,1 @@
+const{contextBridge,ipcRenderer}=require("electron");contextBridge.exposeInMainWorld("cfAgent",{telemetry:()=>ipcRenderer.invoke("agent:telemetry"),expand:v=>ipcRenderer.invoke("agent:expand",v),openSecurity:()=>ipcRenderer.invoke("agent:security")});

@@ -1,48 +1,77 @@
 # CodeForensic Architecture
 
-## Overview
+## Purpose
 
-CodeForensic is designed as a modular full-stack application.
+CodeForensic is a full-stack software-forensics workspace. The architecture keeps ingestion, evidence extraction, persistence, presentation and AI assistance separated so that every displayed result can be traced back to a source or a clearly labelled derived value.
 
-## Architecture
+## System Layers
 
-### Frontend
+| Layer | Main technology | Responsibility |
+|---|---|---|
+| Web client | React 19, Vite, TypeScript | Investigation UI, evidence navigation and visualizations |
+| API | Express 5, TypeScript | Authentication, project, website, AI and intelligence endpoints |
+| Analysis | TypeScript services | File metadata, dependency and security evidence extraction |
+| Persistence | Prisma + PostgreSQL / Neon | Users, projects, files, commits, contributors, dependencies, findings and risk data |
+| AI | Gemini API | Project-aware explanations through backend-controlled access |
+| Web probe | Backend HTTP analysis | Website response, header and document evidence |
+| Desktop companion | Electron + Node.js OS APIs | Early Windows-local telemetry layer |
 
-- React
-- Vite
-- TypeScript
-- Tailwind CSS
+## Repository Analysis Flow
 
-### Backend
+```text
+ZIP / GitHub source
+       │
+       ▼
+Project ingestion
+       │
+       ▼
+Safe file inspection
+       │
+       ├── file metadata / language / line data
+       ├── dependency extraction
+       ├── security heuristics
+       └── available Git evidence
+       │
+       ▼
+PostgreSQL evidence store
+       │
+       ▼
+Command Center + investigation surfaces
+```
 
-- Node.js
-- Express
-- TypeScript
+Imported source code is inspected as data and must not be automatically executed.
 
-### Database
+## Website X-Ray Flow
 
-- PostgreSQL
-- Prisma
+```text
+Public URL
+   │
+   ▼
+SSRF / request validation
+   │
+   ▼
+Direct backend probe
+   ├── response status and timing
+   ├── response/security headers
+   └── HTML/document signals
+   │
+   └── optional PageSpeed/Lighthouse data when available
+```
 
-### Analysis
+Browser-only metrics are not inferred from a server-side request.
 
-- File analysis
-- Git analysis
-- Source analysis
-- Dependency analysis
-- Security analysis
-- Threat analysis
-- Risk calculation
-- Impact analysis
+## Desktop Companion
 
-### AI
+The `desktop/` directory contains the early Windows companion. Its purpose is to provide a small always-available local interface for operating-system telemetry that a normal browser application cannot access.
 
-- Gemini API
-- Backend-only API access
-- Evidence-based context retrieval
+The first layer reads local CPU, physical-memory, uptime and machine information. Endpoint security actions should use genuine operating-system security capabilities rather than simulated scan results.
 
-## Principle
+## Evidence Boundary
 
-The analysis engine must operate on actual project evidence.
+Every output belongs to one of three categories:
 
-The system must not fabricate project statistics, Git history, dependencies, security findings, or risk evidence.
+1. **Observed** — directly extracted or measured.
+2. **Derived** — calculated from observed evidence and identified as such.
+3. **Unavailable** — not measurable in the current execution context.
+
+The architecture should never silently convert unavailable evidence into a synthetic result.
